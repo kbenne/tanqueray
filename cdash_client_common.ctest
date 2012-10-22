@@ -1,7 +1,9 @@
 # Everything below this line shouldn't be modified
-set(CTEST_SOURCE_DIRECTORY "${CDASH_TEMP_DIRECTORY}/dummysource")
-set(CTEST_BINARY_DIRECTORY "${CDASH_TEMP_DIRECTORY}/dummybin")
+set(CTEST_SOURCE_DIRECTORY "${CDASH_TEMP_DIRECTORY}/source")
+set(CTEST_BINARY_DIRECTORY "${CDASH_TEMP_DIRECTORY}/binary")
 set(CTEST_DROP_METHOD "http")
+set(CTEST_DROP_SITE "my.cdash.org")
+set(CTEST_DROP_URL "/submit.php?project=OpenStudio")
 set(CTEST_DROP_LOCATION ${CTEST_DROP_URL}?sitename=${CDASH_SITENAME}&systemname=${CDASH_SYSTEMNAME}&submitinfo=1)
 set(CTEST_DROP_SITE_CDASH true)
 ctest_submit(FILES ${CDASH_SITE_CONFIG_FILE} RETURN_VALUE res)

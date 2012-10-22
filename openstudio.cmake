@@ -7,56 +7,21 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 # used to control when and how this script runs, especially in the case of
 # continuous builds.
 ##############################################################################
-# Configuration variables to be set by the managing ruby script
-#
-# Path configuration for build and source directories
-SET( CTEST_SOURCE_DIRECTORY "<%=source_directory%>" )
-SET( CTEST_BINARY_DIRECTORY "<%=binary_directory%>" )
-SET( CTEST_RUBY_SCRIPT_DIRECTORY "<%=ruby_directory%>" )
+
+SET( build_csharp false )
+SET( build_with_dakota false )
+SET( clean_build true )
+SET( submit_to_dash true )
+SET( run_tests true )
+SET( model "Nightly" )
+
 SET( OPENSTUDIOCORE_DIR "${CTEST_BINARY_DIRECTORY}OpenStudioCore-prefix/src/OpenStudioCore-build" )
-
-SET( CTEST_ENVIRONMENT "DISPLAY=<%=display%>" )
-SET( generator "<%=generator%>" )
-SET( model "<%=model%>" )
-SET( svn_url "<%=svn_url%>" )
-SET( username "<%=username%>" )
-SET( win_version "<%=win_version%>" )
-
-SET( build_csharp <%=build_csharp%> )
-SET( build_with_dakota <%=build_with_dakota%> )
-SET( clean_build <%=clean_build%> )
-SET( submit_package <%=submit_package%> )
-SET( submit_to_dash <%=submit_to_dash%> )
-SET( run_tests <%=runTests%> )
-
-SET( jobs "<%=jobs%>" )
-SET( site "<%=site%>" )
-SET( build_name_modifier "<%=build_name_modifier%>" )
-SET( openstudio_build_dir "<%=openstudio_build_dir%>" )
-
-SET( major_version "<%=major_version%>" )
-SET( minor_version "<%=minor_version%>" )
-SET( patch_version "<%=patch_version%>" )
-
-
-
-##############################################################################
-# Project, Site, and Build name configuration
-SET( CTEST_SITE "${site}" )
-SET( CTEST_BUILD_NAME "${CMAKE_SYSTEM_NAME}${build_name_modifier}" )
-
-IF( ${build_csharp} )
-  SET( CTEST_BUILD_NAME "${CTEST_BUILD_NAME}-csharp" )
-ENDIF()
 
 ###############################################################################
 # Configure for CDash
 SET( JOB_BUILDTYPE "${model}" )
 SET( CTEST_PROJECT_NAME "OpenStudio" )
 SET( CTEST_NIGHTLY_START_TIME "00:00:00 <%=tz%>" )
-SET( CTEST_DROP_METHOD "http" )
-SET( CTEST_DROP_SITE "my.cdash.org" )
-SET( CTEST_DROP_LOCATION "/submit.php?project=OpenStudio" )
 SET( CTEST_DROP_SITE_CDASH TRUE )
 
 ###############################################################################
@@ -67,15 +32,6 @@ SET( MSVC_PACKAGE_NAME "ALL_BUILD" )
 IF( ${model} STREQUAL "Nightly" OR ${model} STREQUAL "Continuous" )
   SET( UNIX_PACKAGE_NAME "package" )
   SET( MSVC_PACKAGE_NAME "PACKAGE" )
-ENDIF()
-
-###############################################################################
-# Build type
-# Configures CTest to use the correct build command depending on platform
-
-SET( sln "OpenStudio.sln" )
-IF( ${model} STREQUAL "Regression" )
-  SET( sln "OpenStudioRegression.sln" )
 ENDIF()
 
 #### Linux and Mac
@@ -112,7 +68,6 @@ ELSEIF( ${generator} STREQUAL "Visual Studio 10 Express" )
   SET( MSVC_IS_EXPRESS "ON" )
   SET( CTEST_BUILD_COMMAND "\"C:\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\IDE\\vcexpress.exe\" ${sln} /build Release /project ${MSVC_PACKAGE_NAME}" )  
 ENDIF()
-
 
 ###############################################################################
 # Start with a completely empty binary directory?
@@ -152,7 +107,6 @@ IF( res EQUAL -1 )
     ctest_update( RETURN_VALUE res )
     IF( res EQUAL -1 )
       message("CTest: Final update failed..")
-      SET(submit_package FALSE)
     ENDIF()
   ENDIF()
 ENDIF()
@@ -179,10 +133,6 @@ IF( ${model} STREQUAL "Nightly" OR ${model} STREQUAL "Continuous" )
     CMAKE_VERSION_BUILD:STRING=${REPO_VERSION}
     MSVC_IS_EXPRESS:BOOL=${MSVC_IS_EXPRESS}
     USE_PCH:BOOL=OFF
-    CPACK_PACKAGE_INSTALL_DIRECTORY:STRING=OpenStudio ${major_version}.${minor_version}.${patch_version}.${REPO_VERSION}
-    CPACK_PACKAGE_INSTALL_REGISTRY_KEY:STRING=OpenStudio ${major_version}.${minor_version}.${patch_version}.${REPO_VERSION}
-    CPACK_NSIS_DISPLAY_NAME:STRING=OpenStudio ${major_version}.${minor_version}.${patch_version}.${REPO_VERSION}
-    CPACK_NSIS_PACKAGE_NAME:STRING=OpenStudio ${major_version}.${minor_version}.${patch_version}.${REPO_VERSION}
     SITE:STRING=${site}
   ")
 
@@ -231,25 +181,6 @@ ELSEIF( ${model} STREQUAL "MemoryCheck" )
   SET( EVN{GLIBCPP_FORCE_NEW} 1) # GCC 3.2.2 and later
   SET( EVN{GLIBCXX_FORCE_NEW} 1) # GCC 3.4 and later
 
-ELSEIF( ${model} STREQUAL "Regression" )
-  SET( INITIAL_CACHE "
-    BUILD_TESTING:BOOL=ON
-    BUILD_PACKAGE:BOOL=OFF
-    CMAKE_VERSION_BUILD:STRING=${REPO_VERSION}
-    OPENSTUDIO_BUILD_DIR:STRING=${openstudio_build_dir}
-    BUILD_ENERGYPLUS_TESTS:BOOL=<%=run_energyplus_tests%>
-    BUILD_MODEL_TESTS:BOOL=<%=run_model_tests%>
-    BUILD_PROJECT_TESTS:BOOL=<%=run_project_tests%>
-    BUILD_RUBY_TESTS:BOOL=<%=run_ruby_tests%>
-    BUILD_RUNMANAGER_TESTS:BOOL=<%=run_runmanager_tests%>
-    BUILD_RULESENGINE_TESTS:BOOL=<%=run_rulesengine_tests%>
-    BUILD_SQUISH_SKETCHUP_TESTS:BOOL=<%=run_squish_sketchup_tests%>
-    BUILD_SQUISH_QT_TESTS:BOOL=<%=run_squish_qt_tests%>
-    MSVC_IS_EXPRESS:BOOL=${MSVC_IS_EXPRESS}
-    CTEST_TESTING_TIMEOUT:STRING=3600
-    DART_TESTING_TIMEOUT:STRING=3600
-    SITE:STRING=${site}
-  ")
 ELSE()
   message( FATAL_ERROR "Unknown model: ${model}")
 ENDIF()
@@ -294,7 +225,6 @@ ctest_configure( BUILD "${CTEST_BINARY_DIRECTORY}" SOURCE "${CTEST_SOURCE_DIRECT
 IF( NOT res EQUAL 0 )
   # Configure failed, do not submit a new package
   message("CTest: Configure failed")
-  SET(submit_package FALSE)
 ENDIF()
 
 ###############################################################################
@@ -303,7 +233,6 @@ message("CTest: Building ${model}")
 ctest_build( BUILD "${CTEST_BINARY_DIRECTORY}" NUMBER_ERRORS res )
 IF( NOT res EQUAL 0 )
   # Build failed, do not submit a new package
-  SET(submit_package FALSE)
 ELSE()
   message("CTest: Build succeeded")
 ENDIF()
@@ -314,8 +243,6 @@ IF( ${run_tests} )
   message("CTest: Testing ${model} on ${OPENSTUDIOCORE_DIR}")
   ctest_test( BUILD "${OPENSTUDIOCORE_DIR}" RETURN_VALUE res )
 ENDIF()
-
-
 
 ###############################################################################
 # Coverage
@@ -350,25 +277,6 @@ IF( ${submit_to_dash} )
     message("CTest: Submission failed")
   ELSE()
     message("CTest: Submission succeeded")
-  ENDIF()
-ENDIF()
-
-###############################################################################
-# Use scp to copy the installer to the download location
-IF( ${submit_package} )
-  message("Uploading package..")
-  IF( APPLE )
-    FILE(GLOB PKG "${CTEST_BINARY_DIRECTORY}/OpenStudio-*-Darwin.dmg")
-    # EXECUTE_PROCESS(COMMAND scp ${PKG} ${username}@cbr.nrel.gov:/srv/cbr/htdocs/openstudio/private/packages/)
-  ELSEIF( WIN32 )
-    # Only submit the version from the windows 7 build
-    IF ( ${site} STREQUAL "w028t-001" )  
-      FILE(GLOB PKG "${CTEST_BINARY_DIRECTORY}/OpenStudio-*-Windows.exe")
-      EXECUTE_PROCESS(COMMAND ruby ${CTEST_RUBY_SCRIPT_DIRECTORY}/submit_to_svn.rb ${PKG})
-    ENDIF()
-  ELSEIF( UNIX )
-    FILE(GLOB PKG "${CTEST_BINARY_DIRECTORY}/OpenStudio-*-Linux.sh")
-    # EXECUTE_PROCESS(COMMAND scp ${PKG} ${username}@cbr.nrel.gov:/srv/cbr/htdocs/openstudio/private/packages/)
   ENDIF()
 ENDIF()
 
