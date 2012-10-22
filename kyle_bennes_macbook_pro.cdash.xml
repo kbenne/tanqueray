@@ -13,7 +13,7 @@
   </compiler>
   <cmake>
     <version>2.8</version>
-    <path>/cmake</path>
+    <path>cmake</path>
   </cmake>
   <program>
     <name>git</name>

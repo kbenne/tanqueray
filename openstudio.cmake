@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+#CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
 ##############################################################################
 # OpenStudio CTest script for build and test automation
 # This is the main CTest script for the Openstudio Nightly and Continuous
@@ -13,8 +13,13 @@ SET( build_with_dakota false )
 SET( clean_build true )
 SET( submit_to_dash true )
 SET( run_tests true )
-SET( model "Nightly" )
+SET( model "Continuous" )
+SET( generator "${JOB_CMAKE_GENERATOR}" )
+SET( username "kbenne" )
+SET( jobs "1" )
 
+set(CTEST_SOURCE_DIRECTORY "${CLIENT_BASE_DIRECTORY}/source/")
+set(CTEST_BINARY_DIRECTORY "${CLIENT_BASE_DIRECTORY}/build/")
 SET( OPENSTUDIOCORE_DIR "${CTEST_BINARY_DIRECTORY}OpenStudioCore-prefix/src/OpenStudioCore-build" )
 
 ###############################################################################
@@ -35,12 +40,12 @@ IF( ${model} STREQUAL "Nightly" OR ${model} STREQUAL "Continuous" )
 ENDIF()
 
 #### Linux and Mac
-IF( ${generator} STREQUAL "Unix Makefiles" )
+IF( "${generator}" STREQUAL "Unix Makefiles" )
   SET( CTEST_CMAKE_GENERATOR "Unix Makefiles" )
   SET( CTEST_BUILD_COMMAND "make ${UNIX_PACKAGE_NAME} -j${jobs}" )
 #### Windows - ${win_version} needs to be set if building on windows 7
 # Visual Studio 2008
-ELSEIF( ${generator} STREQUAL "Visual Studio 9 2008" )
+ELSEIF( "${generator}" STREQUAL "Visual Studio 9 2008" )
   SET( CTEST_CMAKE_GENERATOR "Visual Studio 9 2008" )
   SET( MSVC_IS_EXPRESS "OFF" )
   IF( ${win_version} STREQUAL "7" )
@@ -49,7 +54,7 @@ ELSEIF( ${generator} STREQUAL "Visual Studio 9 2008" )
     SET( CTEST_BUILD_COMMAND "\"C:\\Program Files\\Microsoft Visual Studio 9.0\\Common7\\IDE\\devenv.com\" ${sln} /build Release /project ${MSVC_PACKAGE_NAME}" ) 
   ENDIF()
 # Visual Studio 2008 Express
-ELSEIF( ${generator} STREQUAL "Visual Studio 9 2008 Express" )
+ELSEIF( "${generator}" STREQUAL "Visual Studio 9 2008 Express" )
   SET( CTEST_CMAKE_GENERATOR "Visual Studio 9 2008" )
   SET( MSVC_IS_EXPRESS "ON" )
   IF( ${win_version} STREQUAL "7" )
@@ -58,12 +63,12 @@ ELSEIF( ${generator} STREQUAL "Visual Studio 9 2008 Express" )
     SET( CTEST_BUILD_COMMAND "\"C:\\Program Files\\Microsoft Visual Studio 9.0\\Common7\\IDE\\vcexpress.exe\" ${sln} /build Release /project ${MSVC_PACKAGE_NAME}" ) 
   ENDIF()
 # Visual Studio 2010
-ELSEIF( ${generator} STREQUAL "Visual Studio 10" )
+ELSEIF( "${generator}" STREQUAL "Visual Studio 10" )
   SET( CTEST_CMAKE_GENERATOR "Visual Studio 10" )
   SET( MSVC_IS_EXPRESS "OFF" )
   SET( CTEST_BUILD_COMMAND "\"C:\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\IDE\\devenv.com\" ${sln} /build Release /project ${MSVC_PACKAGE_NAME}" )
 # Visual Studio 2010 Express
-ELSEIF( ${generator} STREQUAL "Visual Studio 10 Express" )
+ELSEIF( "${generator}" STREQUAL "Visual Studio 10 Express" )
   SET( CTEST_CMAKE_GENERATOR "Visual Studio 10" )
   SET( MSVC_IS_EXPRESS "ON" )
   SET( CTEST_BUILD_COMMAND "\"C:\\Program Files\\Microsoft Visual Studio 10.0\\Common7\\IDE\\vcexpress.exe\" ${sln} /build Release /project ${MSVC_PACKAGE_NAME}" )  
@@ -71,16 +76,16 @@ ENDIF()
 
 ###############################################################################
 # Start with a completely empty binary directory?
-IF( ${clean_build} )
-  CTEST_EMPTY_BINARY_DIRECTORY( "${CTEST_BINARY_DIRECTORY}" )
-ENDIF()
+#IF( ${clean_build} )
+#  CTEST_EMPTY_BINARY_DIRECTORY( "${CTEST_BINARY_DIRECTORY}" )
+#ENDIF()
 
 
 ###############################################################################
 # SVN Commands
 IF(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
   message("SVN: Initial checkout (No source directory)")
-  SET( CTEST_CHECKOUT_COMMAND "svn co ${svn_url} --username ${username} --non-interactive ${CTEST_SOURCE_DIRECTORY}" )
+  SET( CTEST_CHECKOUT_COMMAND "svn co ${JOB_REPOSITORY} --username ${username} --non-interactive ${CTEST_SOURCE_DIRECTORY}" )
 ENDIF()
 SET( CTEST_UPDATE_COMMAND "svn" )
 

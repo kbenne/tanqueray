@@ -1,9 +1,7 @@
 # Everything below this line shouldn't be modified
-set(CTEST_SOURCE_DIRECTORY "${CDASH_TEMP_DIRECTORY}/source")
-set(CTEST_BINARY_DIRECTORY "${CDASH_TEMP_DIRECTORY}/binary")
 set(CTEST_DROP_METHOD "http")
 set(CTEST_DROP_SITE "my.cdash.org")
-set(CTEST_DROP_URL "/submit.php?project=OpenStudio")
+set(CTEST_DROP_URL "/submit.php")
 set(CTEST_DROP_LOCATION ${CTEST_DROP_URL}?sitename=${CDASH_SITENAME}&systemname=${CDASH_SYSTEMNAME}&submitinfo=1)
 set(CTEST_DROP_SITE_CDASH true)
 ctest_submit(FILES ${CDASH_SITE_CONFIG_FILE} RETURN_VALUE res)
@@ -15,7 +13,7 @@ ENDIF(NOT "${res}" STREQUAL "0")
 # Get the siteid from CDash
 SET(CDASH_URL ${CTEST_DROP_METHOD}://${CTEST_DROP_SITE}${CTEST_DROP_URL})
 SET(CDASH_CTESTSCRIPT_FILE ${CDASH_TEMP_DIRECTORY}/ctestscript.cdash)
-file(DOWNLOAD ${CDASH_URL}?sitename=${CDASH_SITENAME}&systemname=${CDASH_SYSTEMNAME}&getsiteid=1 ${CDASH_CTESTSCRIPT_FILE})
+file(DOWNLOAD ${CDASH_URL}?project=OpenStudio&sitename=${CDASH_SITENAME}&systemname=${CDASH_SYSTEMNAME}&getsiteid=1 ${CDASH_CTESTSCRIPT_FILE})
 file(READ ${CDASH_CTESTSCRIPT_FILE} CDASH_SITE_ID)
 string(STRIP ${CDASH_SITE_ID} CDASH_SITE_ID)
 
@@ -50,6 +48,7 @@ while (${CTEST_ELAPSED_TIME} LESS 36000)
     SET(CTEST_RUN_CURRENT_SCRIPT 0)
     file(READ ${CDASH_CTESTSCRIPT_FILE} scriptFile)
     ctest_run_script(${CDASH_CTESTSCRIPT_FILE})
+    break()
     # Mark the job has done
     file(DOWNLOAD ${CDASH_URL}?siteid=${CDASH_SITE_ID}&jobdone=1 ${CDASH_CTESTSCRIPT_FILE})
     MESSAGE("DONE Running script")
