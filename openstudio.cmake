@@ -22,6 +22,10 @@ set(CTEST_SOURCE_DIRECTORY "${CLIENT_BASE_DIRECTORY}/source/")
 set(CTEST_BINARY_DIRECTORY "${CLIENT_BASE_DIRECTORY}/build/")
 SET( OPENSTUDIOCORE_DIR "${CTEST_BINARY_DIRECTORY}OpenStudioCore-prefix/src/OpenStudioCore-build" )
 
+if(PROCESSOR_COUNT)
+  set(jobs "${PROCESSOR_COUNT}")
+endif()
+
 ###############################################################################
 # Configure for CDash
 SET( JOB_BUILDTYPE "${model}" )
