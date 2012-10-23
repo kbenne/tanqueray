@@ -31,7 +31,7 @@ MESSAGE("SiteId="${CDASH_SITE_ID})
 while (${CTEST_ELAPSED_TIME} LESS 36000)
 
   # Check if CDash has a job to run
-  file(DOWNLOAD ${CDASH_URL}?siteid=${CDASH_SITE_ID}&getjob=1 ${CDASH_CTESTSCRIPT_FILE})
+  file(DOWNLOAD ${CDASH_URL}?project=OpenStudio&siteid=${CDASH_SITE_ID}&getjob=1 ${CDASH_CTESTSCRIPT_FILE})
   file(STRINGS ${CDASH_CTESTSCRIPT_FILE} firstLine LIMIT_COUNT 1)
 
   IF(${firstLine} EQUAL "0")
