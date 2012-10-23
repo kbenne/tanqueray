@@ -1,0 +1,12 @@
+# These variables define the system and should be set
+# In the future CTest might be able to determine this automatically
+
+set(CDASH_SITENAME "15462s")
+set(CDASH_SYSTEMNAME "Leopard")
+get_filename_component(_thisdir "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(CDASH_SITE_CONFIG_FILE "${_thisdir}/15462s.cdash.xml")
+set(CDASH_TEMP_DIRECTORY "${_thisdir}/workspace/tmp")
+set(CTEST_EXECUTABLE "ctest")
+set(CDASH_LOOP_DURATION 64800) # Available for 18 hours / day
+# Now include the common setup for cdash
+include(cdash_client_common.ctest)
