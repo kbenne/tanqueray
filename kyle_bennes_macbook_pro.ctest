@@ -2,7 +2,7 @@
 # In the future CTest might be able to determine this automatically
 
 set(CDASH_SITENAME "kyle-bennes-macbook-pro")
-set(CDASH_SYSTEMNAME "Leopard")
+set(CDASH_SYSTEMNAME "Mountain-Lion")
 get_filename_component(_thisdir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 set(CDASH_SITE_CONFIG_FILE "${_thisdir}/kyle_bennes_macbook_pro.cdash.xml")
 set(CDASH_TEMP_DIRECTORY "${_thisdir}/workspace/tmp")

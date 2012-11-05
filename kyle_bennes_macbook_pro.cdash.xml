@@ -2,9 +2,9 @@
 <cdash>
   <system>
     <platform>Mac</platform>
-    <version>Leopard</version>
-    <bits>32</bits>
-    <basedirectory>/Users/kbenne/Dashboards/</basedirectory>
+    <version>Mountain Lion</version>
+    <bits>64</bits>
+    <basedirectory>/Volumes/Robin/Users/kbenne/Dashboards/</basedirectory>
   </system>
   <compiler>
     <name>gcc</name>
